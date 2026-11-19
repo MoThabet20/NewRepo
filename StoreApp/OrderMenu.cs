@@ -1,10 +1,5 @@
 ﻿using BL;
 using Domains;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StoreApp
 {
@@ -32,13 +27,13 @@ namespace StoreApp
             switch (choice)
             {
                 case 1:
-                    await ViewAll();
+                    await AddOrder();
                     break;
                 case 2:
-                    await SearchByID();
+                    await ViewAll();
                     break;
                 case 3:
-                    await AddOrder();
+                    await SearchByID();
                     break;
                 case 4:
                     await Update();
@@ -66,32 +61,17 @@ namespace StoreApp
         {
             try
             {
-                if (_OrderBusiness.GetAll().Result != null)
+                Console.Clear();
+                var orders = await _OrderBusiness.GetAll();
+                WelcomMessage("ALL ORDERS LIST");
+                Console.WriteLine("ID  |Item Name     |Order Date");
+                foreach (var order in orders)
                 {
-                    var orders = await _OrderBusiness.GetAll();
-                    var customers = await _CustomerBusiness.GetAll();
-                    var items = await _ItemBusiness.GetAll();
-
-                    WelcomMessage("ALL ORDERS LIST");
-                    Console.WriteLine("ID  | Item Name             | Order Date    |City      ");
-                    foreach (var order in orders)
-                    {
-                        Console.WriteLine($"{order.Id}  | {order.ItemName}         | {order.OrderDate}  | ");
-                    }
-                    Console.WriteLine("===============================================================");
-                    Console.WriteLine($"Total Records: {orders.Count}");
-                    Console.WriteLine("Press any key to return to Customers Menu...");
-                    ConsoleInput.Pause();
+                    Console.WriteLine($"{order.Id}  |{order.ItemName}     | {order.OrderDate}");
                 }
-                else
-                {
-                    WelcomMessage("ALL CUSTOMERS LIST");
-                    Console.WriteLine("[!] INFO: No customers found in the system yet.");
-                    Console.WriteLine("===============================================================");
-                    Console.WriteLine("Press any key to return to Customers Menu...");
-
-                }
-
+                Console.WriteLine("===============================================================");
+                Console.WriteLine($"Total Records: {orders.Count}");
+                ConsoleInput.Pause();
             }
             catch (BusinessLayerException ex)
             {
@@ -104,20 +84,20 @@ namespace StoreApp
             try
             {
                 PrintTittle("Search By ID");
-                int id = ConsoleInput.ReadInt("Enter Customer ID: ", 1, int.MaxValue);
-                var customer = await _CustomerBusiness.GetById(id);
-                Console.WriteLine("=============Customer Details==============");
-                if (customer != null || customer.Id != 0)
+                int id = ConsoleInput.ReadInt("Enter Order ID: ", 1, int.MaxValue);
+                var order = await _OrderBusiness.GetById(id);
+                Console.WriteLine("=============Order Details==============");
+                if (order != null || order.Id != 0)
                 {
-                    Console.WriteLine($"Customer ID: {customer.Id}\n" +
-                        $"Name: {customer.Name}\n" +
-                        $"Phone: {customer.PhoneNumber}\n" +
-                        $"Address: {customer.Address}\n");
+                    Console.WriteLine($"Order ID: {order.Id}\n" +
+                        $"Item Name: {order.ItemName}\n" +
+                        $"Order Date: {order.OrderDate}\n" +
+                        $"Quantity: {order.Quantity}\n");
 
                 }
                 else
                 {
-                    Console.WriteLine($"[!] INFO: No customer found with ID: {id}");
+                    Console.WriteLine($"[!] INFO: No order found with ID: {id}");
                 }
                 ConsoleInput.Pause();
                 Console.WriteLine("=============================================");
@@ -133,15 +113,17 @@ namespace StoreApp
             try
             {
                 Console.Clear();
-                Order oOrder = new Order();
-                Customer oCustomer = new Customer();
-                Item oItem = new Item();
+                Order oOrder = new Order()
+                {
+                    Id = ConsoleInput.ReadInt("Enter Order ID: ", 1, int.MaxValue),
+                    OrderDate = DateTime.Now,
+                };
                 PrintTittle("Add New Order");
-
-                await _CustomerBusiness.AddItem(oCustomer);
-                Console.WriteLine($"[✔] SUCCESS: Customer '{oCustomer.Name}' added successfully! (Assigned ID: {oCustomer.Id})");
-                Console.WriteLine("--------------------------------------------------\r\n" +
-                    "Press any key to return to Customers Menu...");
+                await FillCustomerAndItem(oOrder);
+                oOrder.Quantity = ConsoleInput.ReadInt("Enter Quantity: ", 1, int.MaxValue);
+                await _OrderBusiness.AddItem(oOrder);
+                Console.WriteLine($"[✔] SUCCESS: Order '{oOrder.Id}' added successfully! (Assigned ID: {oOrder.Id})");
+                Console.WriteLine("--------------------------------------------------\r\n");
                 ConsoleInput.Pause();
             }
             catch (BusinessLayerException ex)
@@ -154,32 +136,25 @@ namespace StoreApp
         {
             try
             {
-                PrintTittle("UPDATE CUSTOMER INFORMATION");
-                int id = ConsoleInput.ReadInt("Enter Customer ID to update: ", 1, int.MaxValue);
+                PrintTittle("UPDATE ORDER INFORMATION");
+                int orderId = ConsoleInput.ReadInt("Enter Order ID to update: ", 1, int.MaxValue);
 
-                var existing = await _CustomerBusiness.GetById(id);
+                var existing = await _OrderBusiness.GetById(orderId);
 
                 if (existing != null || existing.Id != 0)
                 {
+                    existing.OrderDate = DateTime.Now;
+                    await FillCustomerAndItem(existing);
 
-                    var Updated = new Customer
-                    {
-                        Id = id,
-                        Name = ConsoleInput.ReadString($"({existing.Name})New Full Name:"),
-                        PhoneNumber = ConsoleInput.ReadString($"({existing.PhoneNumber})New Phone Number: "),
-                        Email = ConsoleInput.ReadString($"({existing.Email})New Email: "),
-                        Address = ConsoleInput.ReadString($"({existing.Address})New Address: ")
-                    };
-
-                    await _CustomerBusiness.Update(Updated);
-                    Console.WriteLine($"[✔] SUCCESS: Customer (ID: {id}) updated successfully!");
+                    await _OrderBusiness.Update(existing);
+                    Console.WriteLine($"[✔] SUCCESS: Order (ID: {orderId}) updated successfully!");
                     ConsoleInput.Pause();
                     Console.WriteLine("--------------------------------------------------------");
                     //Console.WriteLine("Press any key to return to Customers Menu...");
                 }
                 else
                 {
-                    Console.WriteLine("Customer Not Found");
+                    Console.WriteLine("Order Not Found");
                     ConsoleInput.Pause();
                     return;
                 }
@@ -196,11 +171,10 @@ namespace StoreApp
         {
             try
             {
-                var Id = ConsoleInput.ReadInt("Enter Id For Delete Item:");
-                await _CustomerBusiness.Delete(Id);
-                Console.WriteLine($"[✔] SUCCESS: Customer with ID '{Id}' deleted successfully!");
+                var Id = ConsoleInput.ReadInt("Enter Id For Delete Order:");
+                await _OrderBusiness.Delete(Id);
+                Console.WriteLine($"[✔] SUCCESS: Order with ID '{Id}' deleted successfully!");
                 ConsoleInput.Pause();
-                Console.WriteLine("Press any key to return to Customers Menu...");
             }
             catch (BusinessLayerException ex)
             {
@@ -210,6 +184,61 @@ namespace StoreApp
             }
 
 
+        }
+
+        private async Task FillCustomerAndItem(Order order)
+        {
+            ClearScreen();
+            var customers = await _CustomerBusiness.GetAll();
+            WelcomMessage("ALL CUSTOMERS LIST");
+            foreach (var item in customers)
+            {
+                Console.WriteLine($"ID: {item.Id} | Name: {item.Name}");
+            }
+            Console.WriteLine("--------------------------------------------------");
+
+            while (true)
+            {
+                order.CustomerId = ConsoleInput.ReadInt("Enter Customer ID for the order: ", 1, int.MaxValue);
+                var customer = customers.FirstOrDefault(c => c.Id == order.CustomerId);
+                if (customer != null)
+                {
+                    order.CustomerName = customer.Name;
+                    break;
+                }
+                Console.WriteLine("[!] Invalid Customer ID. Please choose an ID from the list above.");
+            }
+
+            ClearScreen(); // يمسح شاشة العملاء ويرسم شاشة المنتجات
+            var items = await _ItemBusiness.GetAll();
+            WelcomMessage("ALL ITEMS LIST");
+            foreach (var item in items)
+            {
+                Console.WriteLine($"ID: {item.Id} | Name: {item.Name} | Price: {item.Price}");
+            }
+            Console.WriteLine("--------------------------------------------------");
+
+            while (true)
+            {
+                order.itemId = ConsoleInput.ReadInt("Enter Item ID for the order: ", 1, int.MaxValue);
+                var itemSelected = items.FirstOrDefault(i => i.Id == order.itemId);
+                if (itemSelected != null)
+                {
+                    order.ItemName = itemSelected.Name;
+                    order.Price = itemSelected.Price;
+                    break;
+                }
+                Console.WriteLine("[!] Invalid Item ID. Please choose an ID from the list above.");
+            }
+
+            order.Quantity = ConsoleInput.ReadInt("Enter Quantity: ", 1, int.MaxValue);
+        }
+
+        void ClearScreen()
+        {
+            Console.Clear();
+            Console.Write("\x1b[3J");
+            Console.SetCursorPosition(0, 0);
         }
     }
 }

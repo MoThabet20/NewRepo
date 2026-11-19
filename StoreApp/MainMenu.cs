@@ -30,7 +30,7 @@
                     break;
                 case 3:
                     OrderMenu orderMenu = new OrderMenu();
-                    orderMenu.Run();
+                    await orderMenu.Run();
                     break;
                 case 0:
                     Exit();
