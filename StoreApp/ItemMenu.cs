@@ -85,7 +85,7 @@ namespace StoreApp
                     WelcomMessage("ALL ITEMS LIST");
                     Console.WriteLine("[!] INFO: No items found in the system yet.");
                     Console.WriteLine("===============================================================");
-                    Console.WriteLine("Press any key to return to Customers Menu...");
+                    ConsoleInput.Pause();
 
                 }
 
@@ -110,11 +110,12 @@ namespace StoreApp
                         $"Name: {item.Name}\n" +
                         $"Price: {item.Price}\n" +
                         $"Quantity: {item.Quantity}\n");
-
+                    ConsoleInput.Pause();
                 }
                 else
                 {
                     Console.WriteLine($"[!] INFO: No item found with ID: {id}");
+                    ConsoleInput.Pause();
                 }
                 Console.WriteLine("=============================================");
             }
@@ -138,8 +139,8 @@ namespace StoreApp
 
                 await _ItemBusiness.AddItem(oItem);
                 Console.WriteLine($"[✔] SUCCESS: Item '{oItem.Name}' added successfully! (Assigned ID: {oItem.Id})");
-                Console.WriteLine("--------------------------------------------------\r\n" +
-                    "Press any key to return to items Menu...");
+                Console.WriteLine("--------------------------------------------------");  
+                ConsoleInput.Pause();
             }
             catch (BusinessLayerException ex)
             {
@@ -155,19 +156,20 @@ namespace StoreApp
                 int id = ConsoleInput.ReadInt("Enter item ID to update: ", 1, int.MaxValue);
 
                 var existing = await _ItemBusiness.GetById(id);
-                if (existing != null || existing.Id != 0)
+                if (existing != null && existing.Id != 0)
                 {
                     var Updated = new Item
                     {
-                        Name = ConsoleInput.ReadString("New Full Name:"),
-                        Price = ConsoleInput.ReadDecimal("New Price: "),
-                        Quantity = ConsoleInput.ReadInt("New Quantity: "),
+                        Id = existing.Id,
+                        Name = ConsoleInput.ReadString($"{existing.Name} --> New Name:"),
+                        Price = ConsoleInput.ReadDecimal($"{existing.Price} -->New Price: "),
+                        Quantity = ConsoleInput.ReadInt($"{existing.Quantity} -->New Quantity: "),
                     };
 
                     await _ItemBusiness.Update(Updated);
                     Console.WriteLine($"[✔] SUCCESS: Item (ID: {id}) updated successfully!");
                     Console.WriteLine("--------------------------------------------------------");
-                    Console.WriteLine("Press any key to return to items Menu...");
+                    ConsoleInput.Pause();
                 }
                 else
                 {
@@ -180,6 +182,8 @@ namespace StoreApp
             {
                 {
                     Console.WriteLine("Business Layer Exception: ");
+                    ConsoleInput.Pause();
+
                 }
             }
         }
