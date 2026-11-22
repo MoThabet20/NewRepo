@@ -65,10 +65,10 @@ namespace StoreApp
                 Console.Clear();
                 var orders = await _OrderBusiness.GetAll();
                 WelcomMessage("ALL ORDERS LIST");
-                Console.WriteLine("ID  |Item Name     |Order Date");
+                Console.WriteLine($"{"ID",-6} | {"Item Name",-20} | {"Order Date",-25} | {"Price",-12} | {"CustomerName",-15}");
                 foreach (var order in orders)
                 {
-                    Console.WriteLine($"{order.Id}  |{order.ItemName}     | {order.OrderDate}");
+                    Console.WriteLine($"{order.Id,-6} | {order.ItemName,-20} | {order.OrderDate,-25} | {order.Price,-12} | {order.CustomerName,-15}");
                 }
                 Console.WriteLine("===============================================================");
                 Console.WriteLine($"Total Records: {orders.Count}");

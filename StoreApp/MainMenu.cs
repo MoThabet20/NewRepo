@@ -10,9 +10,10 @@
             Console.WriteLine("[1] Customers Management \n" +
                 "[2] Items & Inventory Management\n" +
                 "[3] Orders Management\n" +
+                "[4] Reports Management\n" +
                 "[0] Exit");
             Console.WriteLine("===============================================================");
-            Console.WriteLine($">>Please enter your choice (0-3):-");
+            Console.WriteLine($">>Please enter your choice (0-4):-");
         }
 
         public override async Task HandleUserInput(int choice)
@@ -31,6 +32,10 @@
                 case 3:
                     OrderMenu orderMenu = new OrderMenu();
                     await orderMenu.Run();
+                    break;
+                case 4:
+                    ReportsMenu reportsMenu = new ReportsMenu();
+                    await reportsMenu.Run();
                     break;
                 case 0:
                     Exit();
