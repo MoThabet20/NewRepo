@@ -1,4 +1,5 @@
 ﻿using BL;
+using DAL;
 using Domains;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ namespace StoreApp
     public class CustomerMenu : BaseMenu
     {
         public override string MenuTitle => "Customer Management";
-        Business<Customer> _CustomerBusiness = new Business<Customer>();
+        Business<Customer> _CustomerBusiness = new Business<Customer>(StorageType.JsonFile);
         public CustomerMenu()
         {
 

@@ -8,10 +8,26 @@ namespace BL
     {
         private readonly IRepository<T> _repository;
 
-        public Business()
+        public Business(DAL.StorageType storageType)
         {
-            _repository = new Repository<T>(new JsonConverter<T>());
+            switch(storageType)
+            {
+                case DAL.StorageType.InMemory:
+                    //_repository = new Repository<T>(new InMemoryConverter<T>());
+                    break;
+                case DAL.StorageType.JsonFile:
+                    _repository = new Repository<T>(new JsonConverter<T>());
+                    break;
+                case DAL.StorageType.Database:
+                    //_repository = new Repository<T>(new DatabaseConverter<T>());
+                    break;
+                default:
+                    throw new ArgumentException("Invalid storage type.");
+            }
+            
         }
+
+
         public async Task AddItem(T oItem)
         {
             try

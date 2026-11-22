@@ -1,4 +1,5 @@
 ﻿using BL;
+using DAL;
 using Domains;
 
 namespace StoreApp
@@ -6,9 +7,9 @@ namespace StoreApp
     public class OrderMenu : BaseMenu
     {
         public override string MenuTitle => "Order Management";
-        Business<Order> _OrderBusiness = new Business<Order>();
-        Business<Customer> _CustomerBusiness = new Business<Customer>();
-        Business<Item> _ItemBusiness = new Business<Item>();
+        Business<Order> _OrderBusiness = new Business<Order>(StorageType.JsonFile);
+        Business<Customer> _CustomerBusiness = new Business<Customer>(StorageType.JsonFile);
+        Business<Item> _ItemBusiness = new Business<Item>(StorageType.JsonFile);
 
         public override void DisplayOptions()
         {

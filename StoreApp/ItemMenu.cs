@@ -1,4 +1,5 @@
 ﻿using BL;
+using DAL;
 using Domains;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace StoreApp
     public class ItemMenu : BaseMenu
     {
         public override string MenuTitle => "Item Management";
-        Business<Item> _ItemBusiness = new Business<Item>();
+        Business<Item> _ItemBusiness = new Business<Item>(StorageType.JsonFile);
         public ItemMenu()
         {
 

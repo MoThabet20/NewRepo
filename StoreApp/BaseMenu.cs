@@ -12,10 +12,13 @@ namespace StoreApp
     {
         protected BaseMenu()
         {
+            //decide which storage type to use for the application
+            DAL.StorageType storageType = DAL.StorageType.JsonFile;
+
             //Business layer instances for each entity type
-            var itemBL = new Business<Item>();
-            var customerBL = new Business<Customer>();
-            var orderBL = new Business<Order>();
+            var itemBL = new Business<Item>(storageType);
+            var customerBL = new Business<Customer>(storageType);
+            var orderBL = new Business<Order>(storageType);
 
             //menusfor each entity type
             
