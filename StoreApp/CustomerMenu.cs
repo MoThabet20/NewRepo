@@ -70,14 +70,13 @@ namespace StoreApp
                     var customers = await _CustomerBusiness.GetAll();
 
                     WelcomMessage("ALL CUSTOMERS LIST");
-                    Console.WriteLine("ID  | Full Name             | phoneNumber    |City      ");
-                    foreach (var customer in customers)
+                    Console.WriteLine($"{"ID",-6} | {"Full Name",-22} | {"Phone Number",-16} | {"City",-15}");
+                    Console.WriteLine("-------------------------------------------------------------------"); foreach (var customer in customers)
                     {
-                        Console.WriteLine($"{customer.Id}  | {customer.Name}         | {customer.PhoneNumber}  | {customer.Address}");
+                        Console.WriteLine($"{customer.Id,-6} | {customer.Name,-22} | {customer.PhoneNumber,-16} | {customer.Address,-15}");
                     }
                     Console.WriteLine("===============================================================");
                     Console.WriteLine($"Total Records: {customers.Count}");
-                    Console.WriteLine("Press any key to return to Customers Menu...");
                     ConsoleInput.Pause();
                 }
                 else
@@ -85,14 +84,13 @@ namespace StoreApp
                     WelcomMessage("ALL CUSTOMERS LIST");
                     Console.WriteLine("[!] INFO: No customers found in the system yet.");
                     Console.WriteLine("===============================================================");
-                    Console.WriteLine("Press any key to return to Customers Menu...");
-
                 }
 
             }
             catch (BusinessLayerException ex)
             {
                 Console.WriteLine("Business Layer Exception: ");
+                ConsoleInput.Pause();
             }
         }
 

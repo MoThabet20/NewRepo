@@ -71,14 +71,13 @@ namespace StoreApp
                     var items = await _ItemBusiness.GetAll();
 
                     WelcomMessage("ALL ITEMS LIST");
-                    Console.WriteLine("ID          | Item Name             | Quantity    |Price      ");
-                    foreach (var item in items)
+                    Console.WriteLine($"{"ID",-6} | {"Item Name",-24} | {"Quantity",-12} | {"Price",-12}");
+                    Console.WriteLine("---------------------------------------------------------------"); foreach (var item in items)
                     {
-                    Console.WriteLine($"{item.Id}  | {item.Name}           | {item.Quantity}  | {item.Price}");
+                        Console.WriteLine($"{item.Id,-6} | {item.Name,-24} | {item.Quantity,-12} | {item.Price,-12}");
                     }
                     Console.WriteLine("===============================================================");
                     Console.WriteLine($"Total Records: {items.Count}");
-                    Console.WriteLine("Press any key to return to Items Menu...");
                     ConsoleInput.Pause();
                 }
                 else
